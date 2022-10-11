@@ -117,12 +117,16 @@ io.on('connection', (socket) => {
     makeMove(roomId, playerId, myChoice);
     console.log({ myChoice }, { roomId }, { playerId });
 
-    if (playerId === 1) {
-      socket.emit('player_1_moved');
-      socket.broadcast.to(roomId).emit('player_2_moved');
+    // check if player 1 makes move then notify player 2 to make move and vice versa
+    if (choices[roomId][0] !== '' && choices[roomId][1] !== '') {
+      io.to(roomId).emit('move_made', {
+        player1Choice: choices[roomId][0],
+        player2Choice: choices[roomId][1],
+      });
+    } else if (choices[roomId][0] !== '') {
+      socket.broadcast.to(roomId).emit('player_1_made_move');
     } else {
-      socket.emit('player_2_moved');
-      socket.broadcast.to(roomId).emit('player_1_moved');
+      socket.broadcast.to(roomId).emit('player_2_made_move');
     }
 
     if (choices[roomId][0] !== '' && choices[roomId][1] !== '') {
