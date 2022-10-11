@@ -117,6 +117,14 @@ io.on('connection', (socket) => {
     makeMove(roomId, playerId, myChoice);
     console.log({ myChoice }, { roomId }, { playerId });
 
+    if (playerId === 1) {
+      socket.emit('player_1_moved');
+      socket.broadcast.to(roomId).emit('player_2_moved');
+    } else {
+      socket.emit('player_2_moved');
+      socket.broadcast.to(roomId).emit('player_1_moved');
+    }
+
     if (choices[roomId][0] !== '' && choices[roomId][1] !== '') {
       if (choices[roomId][0] === choices[roomId][1]) {
         let message =
