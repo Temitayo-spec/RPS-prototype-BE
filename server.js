@@ -119,20 +119,11 @@ io.on('connection', (socket) => {
 
     // check if player 1 makes move then notify player 2 to make move and vice versa
     if (choices[roomId][0] !== '' && choices[roomId][1] !== '') {
-      io.to(roomId).emit('move_made', {
-        player1Choice: choices[roomId][0],
-        player2Choice: choices[roomId][1],
-      });
-    } else if (choices[roomId][0] !== '') {
-      socket.broadcast.to(roomId).emit('player_1_made_move');
-    } else {
-      socket.broadcast.to(roomId).emit('player_2_made_move');
-    }
-
-    if (choices[roomId][0] !== '' && choices[roomId][1] !== '') {
       if (choices[roomId][0] === choices[roomId][1]) {
         let message =
           'Both of you choose ' + choices[roomId][0] + ".So it's draw";
+        // clear choices
+        initializeChoices(roomId);
         io.to(roomId).emit('draw', message);
       } else if (moves[choices[roomId][0]] === choices[roomId][1]) {
         let message =
@@ -141,7 +132,8 @@ io.on('connection', (socket) => {
           ' and Player 2 choose ' +
           choices[roomId][1] +
           '. So Player 1 wins';
-          choices[roomId] = ['', ''];
+        // clear choices
+        initializeChoices(roomId);
         io.to(roomId).emit('player_1_wins', message);
       } else {
         let message =
@@ -150,9 +142,14 @@ io.on('connection', (socket) => {
           ' and Player 2 choose ' +
           choices[roomId][1] +
           '. So Player 2 wins';
-          choices[roomId] = ['', ''];
+          // clear choices
+        initializeChoices(roomId);
         io.to(roomId).emit('player_2_wins', message);
       }
+    } else if (choices[roomId][0] !== '') {
+      socket.broadcast.to(roomId).emit('player_1_made_move');
+    } else {
+      socket.broadcast.to(roomId).emit('player_2_made_move');
     }
   });
 });
